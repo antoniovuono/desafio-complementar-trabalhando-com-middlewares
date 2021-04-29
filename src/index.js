@@ -27,7 +27,7 @@ function checksExistsUserAccount(request, response, next) {
 
 function checksCreateTodosUserAvailability(request, response, next) {
 
-    const { username } = request.headers;
+    const { user } = request;
 
     if(!user.pro) {
       if (user.todos.length >=10 ) {
@@ -40,7 +40,32 @@ function checksCreateTodosUserAvailability(request, response, next) {
 }
 
 function checksTodoExists(request, response, next) {
-  // Complete aqui
+
+  const { username } = request.headers;
+  const { id } = request.params;
+
+  const userExists = users.find((userExists) => userExists.username === username);
+
+  if(!userExists) {
+    return response.status(404).json({ error: 'User not exists !'});
+  }
+
+  if(!validate(id)) {
+    return response.status(400).json({ error: 'Id is not valid !' });
+  } 
+
+  const user = users.find((user) => user.username === username);
+  const todo = user.todos.find(todo.id === id);
+
+  if(!todo) {
+    return response.status(404).json({ error: 'Todo not exists !'});
+  }
+
+  request.user = user;
+  request.todo = todo;
+
+  return next();
+
 }
 
 function findUserById(request, response, next) {
